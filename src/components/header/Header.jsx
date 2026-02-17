@@ -21,6 +21,7 @@ const Header = ({ type }) => {
  // const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { dispatch } = useContext(SearchContext);
+  console.log("Selected category:", category);
 
   // 🔥 NEW CATEGORY STATE
   const [category, setCategory] = useState("stays");
