@@ -18,7 +18,7 @@ import { SearchContext } from "../../context/SearchContext";
 import { AuthContext } from "../../context/AuthContext";
 
 const Header = ({ type }) => {
-  const navigate = useNavigate();
+ // const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { dispatch } = useContext(SearchContext);
 
@@ -107,7 +107,7 @@ const Header = ({ type }) => {
             {!user && (
               <button
                 className="headerBtn"
-                onClick={() => navigate("/login")}
+               // onClick={() => navigate("/login")}
               >
                 Sign in / Register
               </button>
