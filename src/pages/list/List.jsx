@@ -1,15 +1,16 @@
 import "./list.css";
 import Navbar from "../../components/navbar/Navbar";
 import Header from "../../components/header/Header";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SearchItem from "../../components/searchItem/SearchItem";
 import useFetch from "../../hooks/useFetch";
 
 const List = ({ type }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // 🔥 Read URL params
+  // 🔥 Read values from URL
   const queryParams = new URLSearchParams(location.search);
 
   const city = queryParams.get("city") || "";
@@ -29,6 +30,11 @@ const List = ({ type }) => {
 
   const { data, loading, error } = useFetch(apiUrl);
 
+  // 🔥 Update URL when filter applied
+  const handleFilter = () => {
+    navigate(`/hotels?city=${city}&min=${min}&max=${max}`);
+  };
+
   return (
     <div>
       <Navbar />
@@ -37,7 +43,7 @@ const List = ({ type }) => {
       <div className="listContainer">
         <div className="listWrapper">
 
-          {/* SEARCH PANEL */}
+          {/* LEFT SEARCH PANEL */}
           <div className="listSearch">
             <h1 className="lsTitle">
               {type ? type.toUpperCase() : "Search"}
@@ -52,6 +58,7 @@ const List = ({ type }) => {
               <label>Min price</label>
               <input
                 type="number"
+                value={min}
                 onChange={(e) => setMin(e.target.value)}
               />
             </div>
@@ -60,12 +67,17 @@ const List = ({ type }) => {
               <label>Max price</label>
               <input
                 type="number"
+                value={max}
                 onChange={(e) => setMax(e.target.value)}
               />
             </div>
+
+            <button onClick={handleFilter}>
+              Apply Filter
+            </button>
           </div>
 
-          {/* RESULTS */}
+          {/* RIGHT RESULT PANEL */}
           <div className="listResult">
             {loading ? (
               "Loading..."
