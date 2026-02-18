@@ -50,17 +50,9 @@ const Header = ({ type }) => {
         operation === "i" ? prev[name] + 1 : prev[name] - 1,
     }));
   };
-
-  const handleSearch = () => {
-    dispatch({
-      type: "NEW_SEARCH",
-      payload: { destination, dates, options, category },
-    });
-
-    navigate("/hotels", {
-      state: { destination, dates, options, category },
-    });
-  };
+const handleSearch = () => {
+  navigate(`/hotels?city=${destination}&min=0&max=999`);
+};
 
   const categories = [
     { name: "stays", icon: faBed, label: "Stays" },
@@ -87,7 +79,10 @@ const Header = ({ type }) => {
                   ? "headerListItem active"
                   : "headerListItem"
               }
-              onClick={() => setCategory(item.name)}
+              onClick={() => {
+  setCategory(item.name);
+  navigate(`/${item.name}`);
+}}
             >
               <FontAwesomeIcon icon={item.icon} />
               <span>{item.label}</span>
