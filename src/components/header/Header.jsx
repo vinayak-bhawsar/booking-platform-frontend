@@ -14,18 +14,13 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { SearchContext } from "../../context/SearchContext";
 import { AuthContext } from "../../context/AuthContext";
 
 const Header = ({ type }) => {
- // const navigate = useNavigate();
+  const navigate = useNavigate(); // ✅ MUST be active
   const { user } = useContext(AuthContext);
-  const { dispatch } = useContext(SearchContext);
-  console.log("Selected category:", category);
 
-  // 🔥 NEW CATEGORY STATE
   const [category, setCategory] = useState("stays");
-
   const [destination, setDestination] = useState("");
   const [openDate, setOpenDate] = useState(false);
   const [dates, setDates] = useState([
@@ -46,13 +41,15 @@ const Header = ({ type }) => {
   const handleOption = (name, operation) => {
     setOptions((prev) => ({
       ...prev,
-      [name]:
-        operation === "i" ? prev[name] + 1 : prev[name] - 1,
+      [name]: operation === "i" ? prev[name] + 1 : prev[name] - 1,
     }));
   };
-const handleSearch = () => {
-  navigate(`/hotels?city=${destination}&min=0&max=999`);
-};
+
+  // ✅ Correct Search
+  const handleSearch = () => {
+    if (!destination) return;
+    navigate(`/hotels?city=${destination}&min=0&max=999`);
+  };
 
   const categories = [
     { name: "stays", icon: faBed, label: "Stays" },
@@ -69,7 +66,7 @@ const handleSearch = () => {
           type === "list" ? "headerContainer listMode" : "headerContainer"
         }
       >
-        {/* 🔥 Dynamic Category Section */}
+        {/* Dynamic Categories */}
         <div className="headerList">
           {categories.map((item) => (
             <div
@@ -80,9 +77,9 @@ const handleSearch = () => {
                   : "headerListItem"
               }
               onClick={() => {
-  setCategory(item.name);
-  navigate(`/${item.name}`);
-}}
+                setCategory(item.name);
+                navigate(`/${item.name}`);
+              }}
             >
               <FontAwesomeIcon icon={item.icon} />
               <span>{item.label}</span>
@@ -103,7 +100,7 @@ const handleSearch = () => {
             {!user && (
               <button
                 className="headerBtn"
-               // onClick={() => navigate("/login")}
+                onClick={() => navigate("/login")}
               >
                 Sign in / Register
               </button>
@@ -121,10 +118,7 @@ const handleSearch = () => {
               </div>
 
               <div className="headerSearchItem">
-                <FontAwesomeIcon
-                  icon={faCalendarDays}
-                  className="headerIcon"
-                />
+                <FontAwesomeIcon icon={faCalendarDays} className="headerIcon" />
                 <span
                   onClick={() => setOpenDate(!openDate)}
                   className="headerSearchText"
@@ -138,9 +132,7 @@ const handleSearch = () => {
                 {openDate && (
                   <DateRange
                     editableDateInputs={true}
-                    onChange={(item) =>
-                      setDates([item.selection])
-                    }
+                    onChange={(item) => setDates([item.selection])}
                     moveRangeOnFirstSelection={false}
                     ranges={dates}
                     className="date"
@@ -163,16 +155,15 @@ const handleSearch = () => {
                     {["adult", "children", "room"].map((type) => (
                       <div className="optionItem" key={type}>
                         <span className="optionText">
-                          {type.charAt(0).toUpperCase() +
-                            type.slice(1)}
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
                         </span>
                         <div className="optionCounter">
                           <button
-                            disabled={options[type] <= (type === "children" ? 0 : 1)}
-                            className="optionCounterButton"
-                            onClick={() =>
-                              handleOption(type, "d")
+                            disabled={
+                              options[type] <= (type === "children" ? 0 : 1)
                             }
+                            className="optionCounterButton"
+                            onClick={() => handleOption(type, "d")}
                           >
                             -
                           </button>
@@ -181,9 +172,7 @@ const handleSearch = () => {
                           </span>
                           <button
                             className="optionCounterButton"
-                            onClick={() =>
-                              handleOption(type, "i")
-                            }
+                            onClick={() => handleOption(type, "i")}
                           >
                             +
                           </button>
@@ -195,10 +184,7 @@ const handleSearch = () => {
               </div>
 
               <div className="headerSearchItem">
-                <button
-                  className="headerBtn"
-                  onClick={handleSearch}
-                >
+                <button className="headerBtn" onClick={handleSearch}>
                   Search
                 </button>
               </div>
