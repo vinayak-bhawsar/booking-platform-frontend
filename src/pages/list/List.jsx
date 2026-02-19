@@ -11,12 +11,9 @@ const List = ({ type }) => {
   const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
-
-  const selectedType = queryParams.get("type") || "";
-
-  // ✅ FIXED DEFAULT VALUES
-  const minParam = queryParams.get("min") || 1;
-  const maxParam = queryParams.get("max") || 999999;
+const selectedType = queryParams.get("type") || "";
+const minParam = queryParams.get("min") ? Number(queryParams.get("min")) : 1;
+const maxParam = queryParams.get("max") ? Number(queryParams.get("max")) : 999999;
 
   const [min, setMin] = useState(minParam);
   const [max, setMax] = useState(maxParam);
