@@ -1,28 +1,39 @@
-import Featured from "../../components/featured/Featured";
-import FeaturedProperties from "../../components/featuredProperties/FeaturedProperties";
-import Footer from "../../components/footer/Footer";
-import Header from "../../components/header/Header";
-import MailList from "../../components/mailList/MailList";
+import "./list.css";
 import Navbar from "../../components/navbar/Navbar";
-import PropertyList from "../../components/propertyList/PropertyList";
-import "./home.css";
+import Header from "../../components/header/Header";
+import SearchItem from "../../components/searchItem/SearchItem";
+import { useLocation } from "react-router-dom";
+import useFetch from "../../hooks/useFetch";
 
-const Home = () => {
+const Hotels = () => {
+
+  const location = useLocation();
+  const type = new URLSearchParams(location.search).get("type");
+
+  // 🔥 Important: type pass karo
+  const { data, loading } = useFetch(
+    type ? `/hotels?type=${type}` : "/hotels"
+  );
+
   return (
     <div>
       <Navbar />
-      <Header/>
-      <div className="homeContainer">
-        <Featured/>
-        <h1 className="homeTitle">Browse by property type</h1>
-        <PropertyList/>
-        <h1 className="homeTitle">Homes guests love</h1>
-        <FeaturedProperties/>
-        <MailList/>
-        <Footer/>
+      <Header type="list" />
+      <div className="listContainer">
+        <div className="listResult">
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              {data.hotels?.map((item) => (
+                <SearchItem item={item} key={item._id} />
+              ))}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default Hotels;
