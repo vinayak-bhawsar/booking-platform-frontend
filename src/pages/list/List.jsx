@@ -12,17 +12,18 @@ const List = ({ type }) => {
 
   const queryParams = new URLSearchParams(location.search);
 
-  const city = queryParams.get("city") || "";
   const selectedType = queryParams.get("type") || "";
-  const minParam = queryParams.get("min") || 0;
-  const maxParam = queryParams.get("max") || 999;
+
+  // ✅ FIXED DEFAULT VALUES
+  const minParam = queryParams.get("min") || 1;
+  const maxParam = queryParams.get("max") || 999999;
 
   const [min, setMin] = useState(minParam);
   const [max, setMax] = useState(maxParam);
   const [sort, setSort] = useState("");
   const [page, setPage] = useState(1);
 
-  // ✅ FIXED API URL (city removed for now)
+  // ✅ FINAL API URL
   const apiUrl =
     type === "cars"
       ? `/cars`
@@ -32,14 +33,7 @@ const List = ({ type }) => {
 
   const { data, loading, error } = useFetch(apiUrl);
 
-  // 🔥 DEBUG LOGS
-  useEffect(() => {
-    console.log("Selected Type:", selectedType);
-    console.log("Final API URL:", apiUrl);
-    console.log("Full API Response:", data);
-    console.log("Hotels Array:", data?.hotels);
-  }, [data, selectedType, apiUrl]);
-
+  // Reset page when filter changes
   useEffect(() => {
     setPage(1);
   }, [sort, min, max, selectedType]);
@@ -58,16 +52,11 @@ const List = ({ type }) => {
       <div className="listContainer">
         <div className="listWrapper">
 
-          {/* LEFT SEARCH PANEL */}
+          {/* LEFT FILTER PANEL */}
           <div className="listSearch">
             <h1 className="lsTitle">
               {selectedType ? selectedType.toUpperCase() : "Search"}
             </h1>
-
-            <div className="lsItem">
-              <label>Destination</label>
-              <input placeholder={city} type="text" />
-            </div>
 
             <div className="lsItem">
               <label>Min price</label>
