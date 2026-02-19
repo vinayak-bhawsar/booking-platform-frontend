@@ -80,16 +80,18 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
       return;
     }
 
-    if (selectedRooms.length === 0) {
-      alert("Please select at least one room.");
-      return;
-    }
-
     try {
+      // 🔥 Agar koi room select nahi kiya to first room auto select
+      let roomsToBook = selectedRooms;
+
+      if (roomsToBook.length === 0 && data?.[0]?.roomNumbers?.length > 0) {
+        roomsToBook = [data[0].roomNumbers[0]._id];
+      }
+
       // 🔥 Availability update only if dates exist
       if (startDate && endDate) {
         await Promise.all(
-          selectedRooms.map((roomId) =>
+          roomsToBook.map((roomId) =>
             axios.put(
               `https://booking-platform-w5pg.onrender.com/api/rooms/availability/${roomId}`,
               { dates: alldates },
@@ -101,7 +103,7 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
 
       const totalPrice =
         (days || 1) *
-        selectedRooms.length *
+        roomsToBook.length *
         (data?.[0]?.price || 0);
 
       await axios.post(
@@ -109,7 +111,7 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
         {
           hotelId,
           hotelName: hotel?.name,
-          rooms: selectedRooms,
+          rooms: roomsToBook,
           totalPrice,
           startDate: startDate || null,
           endDate: endDate || null,
