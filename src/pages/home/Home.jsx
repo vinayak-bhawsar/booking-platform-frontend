@@ -1,41 +1,28 @@
-import "./home.css";
-import Navbar from "../../components/navbar/Navbar";
+import Featured from "../../components/featured/Featured";
+import FeaturedProperties from "../../components/featuredProperties/FeaturedProperties";
+import Footer from "../../components/footer/Footer";
 import Header from "../../components/header/Header";
-import SearchItem from "../../components/searchItem/SearchItem";
-import { useLocation } from "react-router-dom";
-import useFetch from "../../hooks/useFetch";
+import MailList from "../../components/mailList/MailList";
+import Navbar from "../../components/navbar/Navbar";
+import PropertyList from "../../components/propertyList/PropertyList";
+import "./home.css";
 
-const Hotels = () => {
-  const location = useLocation();
-  const type = new URLSearchParams(location.search).get("type");
-
-  // ✅ Fetch based on type
-  const { data, loading } = useFetch(
-    type ? `/hotels?type=${type}` : "/hotels"
-  );
-
-  // 🔥 Important Fix
-  const hotels = data?.hotels || [];
-
+const Home = () => {
   return (
     <div>
       <Navbar />
-      <Header type="list" />
-      <div className="listContainer">
-        <div className="listResult">
-          {loading ? (
-            "Loading..."
-          ) : hotels.length > 0 ? (
-            hotels.map((item) => (
-              <SearchItem item={item} key={item._id} />
-            ))
-          ) : (
-            <h2>No Data Found</h2>
-          )}
-        </div>
+      <Header />
+      <div className="homeContainer">
+        <Featured />
+        <h1 className="homeTitle">Browse by property type</h1>
+        <PropertyList />
+        <h1 className="homeTitle">Homes guests love</h1>
+        <FeaturedProperties />
+        <MailList />
+        <Footer />
       </div>
     </div>
   );
 };
 
-export default Hotels;
+export default Home;
