@@ -22,15 +22,23 @@ const List = ({ type }) => {
   const [sort, setSort] = useState("");
   const [page, setPage] = useState(1);
 
-  // 🔥 API URL with type filter support
+  // ✅ FIXED API URL (city removed for now)
   const apiUrl =
     type === "cars"
       ? `/cars`
       : type === "flights"
       ? `/flights`
-      : `/hotels?city=${city}&type=${selectedType}&min=${min}&max=${max}&sort=${sort}&page=${page}&pageSize=5`;
+      : `/hotels?type=${selectedType}&min=${min}&max=${max}&sort=${sort}&page=${page}&pageSize=5`;
 
   const { data, loading, error } = useFetch(apiUrl);
+
+  // 🔥 DEBUG LOGS
+  useEffect(() => {
+    console.log("Selected Type:", selectedType);
+    console.log("Final API URL:", apiUrl);
+    console.log("Full API Response:", data);
+    console.log("Hotels Array:", data?.hotels);
+  }, [data, selectedType, apiUrl]);
 
   useEffect(() => {
     setPage(1);
@@ -38,7 +46,7 @@ const List = ({ type }) => {
 
   const handleFilter = () => {
     navigate(
-      `/hotels?city=${city}&type=${selectedType}&min=${min}&max=${max}`
+      `/hotels?type=${selectedType}&min=${min}&max=${max}`
     );
   };
 
