@@ -15,33 +15,32 @@ const PropertyList = () => {
   ];
 
   const handleClick = (type) => {
-    navigate(`/hotels?type=${type}`);
+    if (type) {
+      navigate(`/hotels?type=${type}`);
+    }
   };
 
   return (
     <div className="pList">
       {loading ? (
-        "loading"
+        "Loading..."
       ) : (
-        <>
-          {data &&
-            images.map((img, i) => (
-              <div
-                className="pListItem"
-                key={i}
-                onClick={() => handleClick(data[i]?.type)}
-                style={{ cursor: "pointer" }}
-              >
-                <img src={img} alt="" className="pListImg" />
-                <div className="pListTitles">
-                  <h1>{data[i]?.type}</h1>
-                  <h2>
-                    {data[i]?.count} {data[i]?.type}
-                  </h2>
-                </div>
-              </div>
-            ))}
-        </>
+        data?.map((item, i) => (
+          <div
+            className="pListItem"
+            key={item.type}
+            onClick={() => handleClick(item.type)}
+            style={{ cursor: "pointer" }}
+          >
+            <img src={images[i]} alt="" className="pListImg" />
+            <div className="pListTitles">
+              <h1>{item.type}</h1>
+              <h2>
+                {item.count} {item.type}
+              </h2>
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

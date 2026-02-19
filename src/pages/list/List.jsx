@@ -13,6 +13,7 @@ const List = ({ type }) => {
   const queryParams = new URLSearchParams(location.search);
 
   const city = queryParams.get("city") || "";
+  const selectedType = queryParams.get("type") || "";
   const minParam = queryParams.get("min") || 0;
   const maxParam = queryParams.get("max") || 999;
 
@@ -21,23 +22,24 @@ const List = ({ type }) => {
   const [sort, setSort] = useState("");
   const [page, setPage] = useState(1);
 
-  // 🔥 Dynamic API with sorting + pagination
+  // 🔥 API URL with type filter support
   const apiUrl =
     type === "cars"
       ? `/cars`
       : type === "flights"
       ? `/flights`
-      : `/hotels?city=${city}&min=${min}&max=${max}&sort=${sort}&page=${page}&pageSize=5`;
+      : `/hotels?city=${city}&type=${selectedType}&min=${min}&max=${max}&sort=${sort}&page=${page}&pageSize=5`;
 
   const { data, loading, error } = useFetch(apiUrl);
 
-  // 🔥 Reset page when filter or sort changes
   useEffect(() => {
     setPage(1);
-  }, [sort, min, max]);
+  }, [sort, min, max, selectedType]);
 
   const handleFilter = () => {
-    navigate(`/hotels?city=${city}&min=${min}&max=${max}`);
+    navigate(
+      `/hotels?city=${city}&type=${selectedType}&min=${min}&max=${max}`
+    );
   };
 
   return (
@@ -51,7 +53,7 @@ const List = ({ type }) => {
           {/* LEFT SEARCH PANEL */}
           <div className="listSearch">
             <h1 className="lsTitle">
-              {type ? type.toUpperCase() : "Search"}
+              {selectedType ? selectedType.toUpperCase() : "Search"}
             </h1>
 
             <div className="lsItem">
@@ -107,7 +109,7 @@ const List = ({ type }) => {
                   <SearchItem item={item} key={item._id} />
                 ))}
 
-                {/* 🔥 Pagination Buttons */}
+                {/* Pagination */}
                 <div style={{ marginTop: "20px" }}>
                   {Array.from(
                     { length: data.totalPages || 1 },
