@@ -12,7 +12,6 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
   const [selectedRooms, setSelectedRooms] = useState([]);
 
   const { data } = useFetch(`/hotels/room/${hotelId}`);
-
   const { dates } = useContext(SearchContext) || {};
   const { user } = useContext(AuthContext);
 
@@ -79,8 +78,20 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
       return;
     }
 
+    // 🔥 IMPORTANT VALIDATION
+    if (!startDate || !endDate) {
+      alert("Please select dates first from search page.");
+      navigate("/");
+      return;
+    }
+
+    if (selectedRooms.length === 0) {
+      alert("Please select at least one room.");
+      return;
+    }
+
     try {
-      // 1️⃣ Update availability
+      // 1️⃣ Update room availability
       await Promise.all(
         selectedRooms.map((roomId) =>
           axios.put(
@@ -95,7 +106,7 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
       const totalPrice =
         days *
         selectedRooms.length *
-        (data[0]?.price || 0);
+        (data?.[0]?.price || 0);
 
       await axios.post(
         "https://booking-platform-w5pg.onrender.com/api/bookings",
