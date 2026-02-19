@@ -7,18 +7,31 @@ import { useContext, useState } from "react";
 import { SearchContext } from "../../context/SearchContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
-const Reserve = ({ setOpen, hotelId }) => {
+const Reserve = ({ setOpen, hotelId, hotel }) => {
   const [selectedRooms, setSelectedRooms] = useState([]);
-  const { data  } = useFetch(`/hotels/room/${hotelId}`);
-  const { dates } = useContext(SearchContext);
+  const { data } = useFetch(`/hotels/room/${hotelId}`);
+  const { dates, options } = useContext(SearchContext);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
+
+  const dayDifference = (date1, date2) => {
+    const timeDiff = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(timeDiff / MILLISECONDS_PER_DAY);
+  };
+
+  const days = dayDifference(
+    new Date(dates[0].startDate),
+    new Date(dates[0].endDate)
+  );
 
   const getDatesInRange = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-
     const date = new Date(start.getTime());
-
     const dates = [];
 
     while (date <= end) {
@@ -29,19 +42,22 @@ const Reserve = ({ setOpen, hotelId }) => {
     return dates;
   };
 
-  const alldates = getDatesInRange(dates[0].startDate, dates[0].endDate);
+  const alldates = getDatesInRange(
+    dates[0].startDate,
+    dates[0].endDate
+  );
 
   const isAvailable = (roomNumber) => {
     const isFound = roomNumber.unavailableDates.some((date) =>
       alldates.includes(new Date(date).getTime())
     );
-
     return !isFound;
   };
 
   const handleSelect = (e) => {
     const checked = e.target.checked;
     const value = e.target.value;
+
     setSelectedRooms(
       checked
         ? [...selectedRooms, value]
@@ -49,22 +65,53 @@ const Reserve = ({ setOpen, hotelId }) => {
     );
   };
 
-  const navigate = useNavigate();
-
   const handleClick = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     try {
+      // 1️⃣ Update room availability
       await Promise.all(
         selectedRooms.map((roomId) => {
-          const res = axios.put(`/rooms/availability/${roomId}`, {
-            dates: alldates,
-          });
-          return res.data;
+          return axios.put(
+            `https://booking-platform-w5pg.onrender.com/api/rooms/availability/${roomId}`,
+            { dates: alldates },
+            { withCredentials: true }
+          );
         })
       );
+
+      // 2️⃣ Create booking entry
+      const totalPrice =
+        days *
+        selectedRooms.length *
+        (data[0]?.price || 0);
+
+      await axios.post(
+        "https://booking-platform-w5pg.onrender.com/api/bookings",
+        {
+          hotelId,
+          hotelName: hotel.name,
+          rooms: selectedRooms,
+          totalPrice,
+          startDate: dates[0].startDate,
+          endDate: dates[0].endDate,
+        },
+        { withCredentials: true }
+      );
+
+      alert("Booking successful 🎉");
       setOpen(false);
       navigate("/");
-    } catch (err) {}
+
+    } catch (err) {
+      console.log(err);
+      alert("Booking failed");
+    }
   };
+
   return (
     <div className="reserve">
       <div className="rContainer">
@@ -73,7 +120,9 @@ const Reserve = ({ setOpen, hotelId }) => {
           className="rClose"
           onClick={() => setOpen(false)}
         />
+
         <span>Select your rooms:</span>
+
         {data.map((item) => (
           <div className="rItem" key={item._id}>
             <div className="rItemInfo">
@@ -82,11 +131,12 @@ const Reserve = ({ setOpen, hotelId }) => {
               <div className="rMax">
                 Max people: <b>{item.maxPeople}</b>
               </div>
-              <div className="rPrice">{item.price}</div>
+              <div className="rPrice">${item.price}</div>
             </div>
+
             <div className="rSelectRooms">
               {item.roomNumbers.map((roomNumber) => (
-                <div className="room">
+                <div className="room" key={roomNumber._id}>
                   <label>{roomNumber.number}</label>
                   <input
                     type="checkbox"
@@ -99,6 +149,7 @@ const Reserve = ({ setOpen, hotelId }) => {
             </div>
           </div>
         ))}
+
         <button onClick={handleClick} className="rButton">
           Reserve Now!
         </button>
