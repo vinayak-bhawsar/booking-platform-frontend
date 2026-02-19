@@ -37,10 +37,16 @@ const Hotel = () => {
     return Math.ceil(timeDiff / MILLISECONDS_PER_DAY);
   };
 
-  const days = dayDifference(
-    new Date(dates[0].endDate),
-    new Date(dates[0].startDate)
-  );
+  let days = 1;
+
+  if (dates && dates.length > 0) {
+    days = dayDifference(
+      new Date(dates[0].endDate),
+      new Date(dates[0].startDate)
+    );
+  }
+
+  const roomCount = options?.room || 1;
 
   const handleOpen = (i) => {
     setSlideNumber(i);
@@ -90,7 +96,7 @@ const Hotel = () => {
               />
               <div className="sliderWrapper">
                 <img
-                  src={data.photos[slideNumber]}
+                  src={data.photos?.[slideNumber]}
                   alt=""
                   className="sliderImg"
                 />
@@ -104,7 +110,11 @@ const Hotel = () => {
           )}
 
           <div className="hotelWrapper">
-            <button className="bookNow" onClick={handleClick}>
+            {/* MAIN RESERVE BUTTON */}
+            <button
+              className="bookNow"
+              onClick={handleClick}
+            >
               Reserve or Book Now!
             </button>
 
@@ -120,8 +130,7 @@ const Hotel = () => {
             </span>
 
             <span className="hotelPriceHighlight">
-              Book a stay over ${data.cheapestPrice} at this property and get a
-              free airport taxi
+              Book a stay over ${data.cheapestPrice} at this property
             </span>
 
             <div className="hotelImages">
@@ -146,14 +155,9 @@ const Hotel = () => {
               <div className="hotelDetailsPrice">
                 <h1>Perfect for a {days}-night stay!</h1>
 
-                <span>
-                  Located in the real heart of Krakow, this property has an
-                  excellent location score of 9.8!
-                </span>
-
                 <h2>
                   <b>
-                    ${days * data.cheapestPrice * options.room}
+                    ${days * data.cheapestPrice * roomCount}
                   </b>{" "}
                   ({days} nights)
                 </h2>
@@ -170,7 +174,6 @@ const Hotel = () => {
         </div>
       )}
 
-      {/* 🔥 Important Update Here */}
       {openModal && (
         <Reserve
           setOpen={setOpenModal}
