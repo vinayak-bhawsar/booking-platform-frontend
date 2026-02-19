@@ -1,4 +1,4 @@
-import "./list.css";
+import "../list/list.css";
 import Navbar from "../../components/navbar/Navbar";
 import Header from "../../components/header/Header";
 import SearchItem from "../../components/searchItem/SearchItem";
