@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-
 import "./reserve.css";
 import useFetch from "../../hooks/useFetch";
 import { useContext, useState } from "react";
@@ -11,9 +10,12 @@ import { AuthContext } from "../../context/AuthContext";
 
 const Reserve = ({ setOpen, hotelId, hotel }) => {
   const [selectedRooms, setSelectedRooms] = useState([]);
+
   const { data } = useFetch(`/hotels/room/${hotelId}`);
-  const { dates, options } = useContext(SearchContext);
+
+  const { dates } = useContext(SearchContext) || {};
   const { user } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -23,34 +25,40 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
     return Math.ceil(timeDiff / MILLISECONDS_PER_DAY);
   };
 
-  const days = dayDifference(
-    new Date(dates[0].startDate),
-    new Date(dates[0].endDate)
-  );
+  /* ================= SAFE DATE HANDLING ================= */
 
-  const getDatesInRange = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const date = new Date(start.getTime());
-    const dates = [];
+  let startDate = null;
+  let endDate = null;
+  let days = 1;
+  let alldates = [];
 
-    while (date <= end) {
-      dates.push(new Date(date).getTime());
-      date.setDate(date.getDate() + 1);
+  if (dates && Array.isArray(dates) && dates.length > 0) {
+    startDate = dates[0]?.startDate;
+    endDate = dates[0]?.endDate;
+
+    if (startDate && endDate) {
+      days = dayDifference(new Date(startDate), new Date(endDate));
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const date = new Date(start.getTime());
+
+      while (date <= end) {
+        alldates.push(new Date(date).getTime());
+        date.setDate(date.getDate() + 1);
+      }
     }
+  }
 
-    return dates;
-  };
-
-  const alldates = getDatesInRange(
-    dates[0].startDate,
-    dates[0].endDate
-  );
+  /* ====================================================== */
 
   const isAvailable = (roomNumber) => {
+    if (!roomNumber.unavailableDates) return true;
+
     const isFound = roomNumber.unavailableDates.some((date) =>
       alldates.includes(new Date(date).getTime())
     );
+
     return !isFound;
   };
 
@@ -72,18 +80,18 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
     }
 
     try {
-      // 1️⃣ Update room availability
+      // 1️⃣ Update availability
       await Promise.all(
-        selectedRooms.map((roomId) => {
-          return axios.put(
+        selectedRooms.map((roomId) =>
+          axios.put(
             `https://booking-platform-w5pg.onrender.com/api/rooms/availability/${roomId}`,
             { dates: alldates },
             { withCredentials: true }
-          );
-        })
+          )
+        )
       );
 
-      // 2️⃣ Create booking entry
+      // 2️⃣ Save booking
       const totalPrice =
         days *
         selectedRooms.length *
@@ -93,18 +101,18 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
         "https://booking-platform-w5pg.onrender.com/api/bookings",
         {
           hotelId,
-          hotelName: hotel.name,
+          hotelName: hotel?.name,
           rooms: selectedRooms,
           totalPrice,
-          startDate: dates[0].startDate,
-          endDate: dates[0].endDate,
+          startDate,
+          endDate,
         },
         { withCredentials: true }
       );
 
       alert("Booking successful 🎉");
       setOpen(false);
-      navigate("/");
+      navigate("/my-bookings");
 
     } catch (err) {
       console.log(err);
@@ -123,7 +131,7 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
 
         <span>Select your rooms:</span>
 
-        {data.map((item) => (
+        {data?.map((item) => (
           <div className="rItem" key={item._id}>
             <div className="rItemInfo">
               <div className="rTitle">{item.title}</div>
@@ -135,7 +143,7 @@ const Reserve = ({ setOpen, hotelId, hotel }) => {
             </div>
 
             <div className="rSelectRooms">
-              {item.roomNumbers.map((roomNumber) => (
+              {item.roomNumbers?.map((roomNumber) => (
                 <div className="room" key={roomNumber._id}>
                   <label>{roomNumber.number}</label>
                   <input
