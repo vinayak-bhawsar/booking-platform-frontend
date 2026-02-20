@@ -28,33 +28,45 @@ const MyBookings = () => {
     <div>
       <Navbar />
 
-      <div className="bookingContainer">
-        <h1>My Bookings</h1>
+      <div className="bookingPage">
+        <h1 className="bookingHeading">My Bookings</h1>
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="centerText">Loading your bookings...</div>
         ) : bookings.length === 0 ? (
-          <p>No bookings found.</p>
+          <div className="emptyState">
+            <h2>No Bookings Yet 😔</h2>
+            <p>Book your first stay and enjoy your trip!</p>
+          </div>
         ) : (
-          bookings.map((booking) => (
-            <div className="bookingCard" key={booking._id}>
-              <h2>{booking.hotelName}</h2>
-              <p>
-                <strong>Check-in:</strong>{" "}
-                {new Date(booking.startDate).toDateString()}
-              </p>
-              <p>
-                <strong>Check-out:</strong>{" "}
-                {new Date(booking.endDate).toDateString()}
-              </p>
-              <p>
-                <strong>Total Price:</strong> ${booking.totalPrice}
-              </p>
-              <p>
-                <strong>Status:</strong> {booking.status}
-              </p>
-            </div>
-          ))
+          <div className="bookingGrid">
+            {bookings.map((booking) => (
+              <div className="bookingCard" key={booking._id}>
+                <div className="bookingTop">
+                  <h2>{booking.hotelName}</h2>
+                  <span className="statusBadge">
+                    {booking.status || "Confirmed"}
+                  </span>
+                </div>
+
+                {booking.startDate && booking.endDate && (
+                  <div className="dateBox">
+                    {new Date(booking.startDate).toDateString()} →{" "}
+                    {new Date(booking.endDate).toDateString()}
+                  </div>
+                )}
+
+                <div className="bookingBottom">
+                  <div>
+                    <strong>Rooms:</strong> {booking.rooms?.length}
+                  </div>
+                  <div className="priceTag">
+                    ₹ {booking.totalPrice}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
