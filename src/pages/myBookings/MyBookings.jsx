@@ -29,46 +29,30 @@ const MyBookings = () => {
       <Navbar />
 
       <div className="bookingContainer">
-        <h1 className="bookingTitle">My Bookings</h1>
+        <h1>My Bookings</h1>
 
         {loading ? (
-          <div className="centerMessage">Loading bookings...</div>
+          <p>Loading...</p>
         ) : bookings.length === 0 ? (
-          <div className="emptyBox">
-            <h3>No bookings found 😔</h3>
-            <p>Book your next stay now!</p>
-          </div>
+          <p>No bookings found.</p>
         ) : (
           bookings.map((booking) => (
             <div className="bookingCard" key={booking._id}>
-              <div className="bookingLeft">
-                <h2>{booking.hotelName}</h2>
-
-                {booking.startDate && booking.endDate && (
-                  <p className="bookingDates">
-                    {new Date(booking.startDate).toDateString()} →{" "}
-                    {new Date(booking.endDate).toDateString()}
-                  </p>
-                )}
-
-                <p className="roomsText">
-                  Rooms Booked: {booking.rooms?.length}
-                </p>
-              </div>
-
-              <div className="bookingRight">
-                <h3 className="price">
-                  ₹ {booking.totalPrice}
-                </h3>
-
-                <span
-                  className={`status ${
-                    booking.status || "confirmed"
-                  }`}
-                >
-                  {booking.status || "Confirmed"}
-                </span>
-              </div>
+              <h2>{booking.hotelName}</h2>
+              <p>
+                <strong>Check-in:</strong>{" "}
+                {new Date(booking.startDate).toDateString()}
+              </p>
+              <p>
+                <strong>Check-out:</strong>{" "}
+                {new Date(booking.endDate).toDateString()}
+              </p>
+              <p>
+                <strong>Total Price:</strong> ${booking.totalPrice}
+              </p>
+              <p>
+                <strong>Status:</strong> {booking.status}
+              </p>
             </div>
           ))
         )}
