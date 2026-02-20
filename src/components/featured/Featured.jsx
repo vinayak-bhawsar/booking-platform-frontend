@@ -14,7 +14,7 @@ const Featured = () => {
         <>
           <div className="featuredItem">
             <img
-              src="https://cf.bstatic.com/xdata/images/city/max500/957801.webp?k=a969e39bcd40cdcc21786ba92826063e3cb09bf307bcfeac2aa392b838e9b7a5&o="
+              src="https://www.google.com/search?vsrid=CKWByYzO3vHU7QEQAhgBIiQzNDJiMzA0Yi1kMzk2LTQyZDEtODE5MS05MjQ2MWM1ODc0ZDQyBiICc2Qodji07_bj6OeSAw&vsint=CAIqDAoCCAcSAggKGAEgATojChYNAAAAPxUAAAA_HQAAgD8lAACAPzABEJMCGLgBJQAAgD8&udm=26&lns_mode=un&source=lns.web.gisivli&vsdim=275,184&gsessionid=ZHaa6OosUMZOYyzocJQnPEkqilegVmay3di_nMIipNxExhm5yt2Mwg&lsessionid=6g4ItQDpexuSSu0UZ_8CLgSk3cGkWWe0maTvY-2-NIuOECMlilbdmQ&lns_surface=19&authuser=0&lns_vfs=e&qsubts=1771581874524&biw=1243&bih=568&ved=0CBgQh6cGahcKEwiw8u7c6OeSAxUAAAAAHQAAAAAQCA&tbnid=JS8Zq41A3ZhtXM&ictx=2"
               alt=""
               className="featuredImg"
             />
